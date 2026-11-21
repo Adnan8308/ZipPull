@@ -48,10 +48,10 @@ class MainActivity : Activity() {
             text = "ZipPull"; textSize = 28f; setTextColor(Color.WHITE); typeface = Typeface.DEFAULT_BOLD
         })
         root.addView(TextView(this).apply {
-            text = "Download what's inside a ZIP - not the ZIP."; setTextColor(muted)
+            text = "Download what's inside a ZIP or 7z - not the archive."; setTextColor(muted)
         })
         urlBox = EditText(this).apply {
-            hint = "Direct link to .zip"; setTextColor(Color.WHITE)
+            hint = "Direct link to .zip or .7z"; setTextColor(Color.WHITE)
             setHintTextColor(Color.GRAY); setSingleLine(true)
         }
         root.addView(urlBox)
@@ -84,7 +84,7 @@ class MainActivity : Activity() {
             max = 1000; progressTintList = ColorStateList.valueOf(accent)
         }
         root.addView(bar)
-        info = TextView(this).apply { setTextColor(Color.WHITE); text = "Paste a direct ZIP link, then tap Load files." }
+        info = TextView(this).apply { setTextColor(Color.WHITE); text = "Paste a direct ZIP or 7z link, then tap Load files." }
         root.addView(info)
         goBtn = Button(this).apply { text = "Download selected"; setOnClickListener { start() } }
         root.addView(goBtn)
@@ -110,10 +110,10 @@ class MainActivity : Activity() {
     private fun load() {
         val u = urlBox.text.toString().trim()
         if (u.isEmpty()) return
-        info.text = "Reading ZIP index..."
+        info.text = "Reading archive index..."
         Thread {
             try {
-                val (size, items) = Zip.list(u)
+                val (size, items) = Sz.listAny(u)
                 State.url = u
                 State.zipSize = size
                 val sorted = items.sortedBy { it.name }
@@ -124,10 +124,10 @@ class MainActivity : Activity() {
                         sorted.map { "${it.name}\n${fmt(it.size)}" }
                     )
                     for (i in sorted.indices) list.setItemChecked(i, true)
-                    info.text = "${sorted.size} files, ${fmt(sorted.sumOf { it.size })} extracted (ZIP is ${fmt(size)})"
+                    info.text = "${sorted.size} files, ${fmt(sorted.sumOf { it.size })} extracted (archive is ${fmt(size)})"
                 }
             } catch (t: Throwable) {
-                runOnUiThread { info.text = "Couldn't read ZIP: ${t.message}" }
+                runOnUiThread { info.text = "Couldn't read archive: ${t.message}" }
             }
         }.start()
     }
