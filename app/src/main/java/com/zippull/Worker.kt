@@ -87,6 +87,7 @@ class Saf(private val cr: ContentResolver, private val tree: Uri) {
 
 object Worker {
     fun run(ctx: Context) {
+        if (Mode.sevenZ) { Sz.run(ctx); return }
         val cr = ctx.contentResolver
         val saf = Saf(cr, State.tree!!)
         val pool = Executors.newFixedThreadPool(3)
